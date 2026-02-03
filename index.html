@@ -4,156 +4,130 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="theme-color" content="#061b14"/>
-  <title>DIGIY HUB ∞ — F16</title>
-  <meta name="description" content="DIGIY HUB — 0% commission. Paiement direct. Terrain ready." />
+  <title>DIGIY HUB ∞ — 0% commission • paiement direct</title>
+  <meta name="description" content="DIGIY HUB — Modules publics + accès PRO. 0% commission. Paiement direct au pro. Terrain ready." />
 
+  <link rel="stylesheet" href="./hub.css?v=f16-1"/>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./hub.css?v=f16-final">
 
-  <script defer src="./hub.js?v=f16-final"></script>
+  <script defer src="./hub.js?v=f16-1"></script>
 </head>
 
 <body>
-  <div class="bg">
-    <div class="radial"></div>
-    <div class="grain"></div>
-  </div>
-
+  <div class="bg"></div>
   <header class="top">
     <div class="brand">
       <div class="logo">∞</div>
       <div class="brandText">
         <div class="title">DIGIY HUB</div>
-        <div class="tag">0% commission · Paiement direct · Terrain ready</div>
+        <div class="subtitle">0% commission · paiement direct · terrain ready</div>
       </div>
     </div>
 
-    <div class="topActions">
-      <button class="chip" id="btnOpenOverlay" type="button" aria-haspopup="dialog">
-        🚀 Entrer dans mon HUB
-      </button>
-      <button class="chip ghost" id="btnAlreadyAccess" type="button">
-        🔑 J’ai déjà mon accès
-      </button>
+    <div class="hero">
+      <div class="heroLeft">
+        <h1>Tout DIGIY. Public + PRO.<span class="dot">●</span></h1>
+        <p>
+          Ici tu vois <b>les modules publics</b> (accès libre) et <b>les modules PRO</b> (accès requis).
+          Un HUB propre : pas de bazar, pas de perte de temps.
+        </p>
+
+        <div class="ctaRow">
+          <button id="btnEnterHubPro" class="btn primary">🚀 Entrer dans mon HUB PRO</button>
+          <button id="btnAlreadyAccess" class="btn ghost">🔑 J’ai déjà mon accès</button>
+          <button id="btnActivate" class="btn outline">⚡ Activer un module</button>
+        </div>
+
+        <div class="miniRow">
+          <div class="chip">
+            <span class="chipK">📱 Numéro</span>
+            <span id="phoneText" class="chipV">non mémorisé</span>
+          </div>
+          <button id="btnEditPhone" class="btn tiny">Modifier</button>
+          <button id="btnClearPhone" class="btn tiny danger">Effacer</button>
+        </div>
+      </div>
+
+      <div class="heroRight">
+        <div class="panel">
+          <div class="panelTitle">🧭 Navigation F16</div>
+          <div class="panelHint">Filtre + recherche + modules data-driven.</div>
+
+          <div class="controls">
+            <div class="tabs" role="tablist">
+              <button class="tab active" data-filter="all">Tous</button>
+              <button class="tab" data-filter="public">Public</button>
+              <button class="tab" data-filter="pro">PRO</button>
+            </div>
+
+            <div class="searchBox">
+              <input id="searchInput" type="search" placeholder="Chercher un module… (ex: map, loc, driver, pay)" autocomplete="off"/>
+              <button id="btnReset" class="btn tiny">Reset</button>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><div class="statN" id="statTotal">0</div><div class="statL">Total</div></div>
+            <div class="stat"><div class="statN" id="statPublic">0</div><div class="statL">Public</div></div>
+            <div class="stat"><div class="statN" id="statPro">0</div><div class="statL">PRO</div></div>
+          </div>
+
+          <div class="note">
+            <b>Astuce terrain :</b> si ton numéro est mémorisé, le HUB peut l’envoyer en paramètre aux modules
+            (quand le module le supporte). Sinon, navigation simple.
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1>Le cockpit central.<span class="soft"> Tous tes modules, visibles.</span></h1>
-      <p>
-        Ici c’est la vitrine : tu vois les modules. Pour utiliser, tu actives ou tu entres dans ton espace PRO.
-      </p>
-
-      <div class="heroCard">
-        <div class="row">
-          <div class="kpi">
-            <div class="kpiN">♾️</div>
-            <div class="kpiT">Écosystème DIGIYLYFE</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiN">0%</div>
-            <div class="kpiT">Commission</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiN">⚡</div>
-            <div class="kpiT">Terrain speed</div>
-          </div>
-        </div>
-
-        <div class="phoneRow">
-          <label class="lbl" for="phoneInput">📱 Numéro</label>
-          <div class="phoneBox">
-            <input id="phoneInput" inputmode="tel" autocomplete="tel" placeholder="+2217…" />
-            <button id="btnRemember" class="btn" type="button">Mémoriser</button>
-          </div>
-          <div class="hint" id="phoneHint">Astuce : ton numéro sert à retrouver ton HUB plus vite.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sectionHead">
-      <div>
+  <main class="main">
+    <section class="section">
+      <div class="sectionHead">
         <h2>Modules</h2>
-        <div class="sub">Vitrine publique + accès PRO selon activation.</div>
+        <div class="legend">
+          <span class="pill live">LIVE</span>
+          <span class="pill beta">BETA</span>
+          <span class="pill soon">SOON</span>
+          <span class="pill public">PUBLIC</span>
+          <span class="pill pro">PRO</span>
+        </div>
       </div>
 
-      <div class="tools">
-        <input id="searchInput" class="search" placeholder="Rechercher un module…" />
-        <button id="btnReloadModules" class="btnTiny" type="button">↻</button>
-      </div>
+      <div id="modulesGrid" class="grid" aria-live="polite"></div>
     </section>
 
-    <section class="grid" id="modulesGrid" aria-live="polite"></section>
-
-    <footer class="foot">
+    <footer class="footer">
       <div class="footLine">
-        <span class="pill">🦅 F16 ready</span>
-        <span class="pill">Sénégal → Afrique → Monde</span>
-        <span class="pill">Paiement direct au pro</span>
+        <span class="footBrand">DIGIYLYFE</span>
+        <span class="sep">·</span>
+        <span>0% commission</span>
+        <span class="sep">·</span>
+        <span>paiement direct</span>
+        <span class="sep">·</span>
+        <span>Afrique first</span>
       </div>
-      <div class="footSmall">DIGIYLYFE ∞ — outil simple, puissant, sécurisé.</div>
+      <div class="footTiny">F16 build · HTML clean · CSS/JS séparés · data-driven</div>
     </footer>
   </main>
 
-  <!-- Floating buttons -->
-  <div class="floatBar" aria-label="Actions rapides">
-    <button class="floatBtn" id="floatNdimbal" type="button" title="NDIMBAL MAP">🧭</button>
-    <button class="floatBtn" id="floatQR" type="button" title="QR PRO">📷</button>
-    <button class="floatBtn glow" id="floatPro" type="button" title="Accès PRO">🦅</button>
-  </div>
+  <!-- Modal (simple) -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalTitle" id="modalTitle">Titre</div>
+      <div class="modalText" id="modalText">Texte</div>
 
-  <!-- Overlay -->
-  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="sheet" role="document">
-      <div class="sheetTop">
-        <div class="sheetTitle">
-          <div class="sheetLogo">∞</div>
-          <div>
-            <div class="sheetH">Entrer dans mon HUB</div>
-            <div class="sheetS">Accès PRO sur demande · Inscription guidée</div>
-          </div>
-        </div>
-        <button class="x" id="btnCloseOverlay" type="button" aria-label="Fermer">✕</button>
-      </div>
-
-      <div class="sheetBody">
-        <div class="card">
-          <div class="cardH">Choisis ton chemin</div>
-          <div class="cardP">PRO : on t’envoie vers l’inscription DIGIY. Public : tu peux explorer les modules visibles.</div>
-
-          <div class="sheetActions">
-            <button class="btnPrimary" id="btnGoPro" type="button">🦅 Accès PRO</button>
-            <button class="btnSecondary" id="btnGoPublic" type="button">👀 Rester vitrine</button>
-          </div>
-
-          <div class="line"></div>
-
-          <div class="mini">
-            <div class="miniH">Déjà un lien direct ?</div>
-            <button class="btnTiny wide" id="btnOpenNdimbal" type="button">🧭 Ouvrir NDIMBAL MAP</button>
-            <button class="btnTiny wide" id="btnOpenQR" type="button">📷 Ouvrir QR PRO</button>
-          </div>
-        </div>
-
-        <div class="notice">
-          <div class="noticeDot"></div>
-          <div>
-            <div class="noticeH">Rappel</div>
-            <div class="noticeP">Tous les espaces PRO passent par l’inscription / activation. Zéro commission, paiement direct.</div>
-          </div>
-        </div>
+      <div class="modalActions">
+        <button id="modalCancel" class="btn ghost">Annuler</button>
+        <button id="modalOk" class="btn primary">OK</button>
       </div>
     </div>
   </div>
-
-  <noscript>
-    <div class="noscript">Active JavaScript pour utiliser le HUB.</div>
-  </noscript>
 </body>
 </html>
