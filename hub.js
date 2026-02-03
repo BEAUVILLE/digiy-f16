@@ -38,7 +38,7 @@ const LINKS = {
   locPro:          "https://beauville.github.io/digiy-loc-pro/",
   buildPro:        "https://beauville.github.io/digiy-build-pro/",
   marketPro:       "https://beauville.github.io/digiy-market-pro/",
-  jobsPro:         "https://beauville.github.io/digiy-jobs-pro/",
+  jobsPro:         "https://beauville.github.io/inscription-digiy/",
   espacePro:       "https://beauville.github.io/inscription-digiy/",
 
   // FRET (PIN direct)
