@@ -1,9 +1,9 @@
-/* DIGIY HUB F16 — final (data-driven) */
+/* DIGIY HUB F16 — final (data-driven) — CLEAN */
 
-const $ = (sel, root=document) => root.querySelector(sel);
-const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-const STORAGE_PHONE = "DIGIY_HUB_PHONE";
+const STORAGE_PHONE  = "DIGIY_HUB_PHONE";
 const STORAGE_FILTER = "DIGIY_HUB_FILTER";
 const STORAGE_SEARCH = "DIGIY_HUB_SEARCH";
 
@@ -49,278 +49,142 @@ const LINKS = {
 /* ====== MODULES (DATA) ====== */
 const MODULES = [
   // PUBLIC
-  {
-    key: "bonneAffaire",
-    name: "DIGIY BONNE AFFAIRE",
-    icon: "💥",
-    tag: "BONS PLANS • PROMOS",
-    desc: "Les meilleures opportunités locales : promos, deals, bonnes affaires terrain.",
-    kind: "public",
-    status: "live",
-    phoneParam: false
-  },
-  {
-    key: "ndimbalMap",
-    name: "DIGIY NDIMBAL MAP",
-    icon: "🗺️",
-    tag: "CARTE COMMUNAUTÉ",
-    desc: "Annuaire géolocalisé : pros, quartiers, filtres. Sénégal terrain.",
-    kind: "public",
-    status: "live",
-    phoneParam: false
-  },
-  {
-    key: "driverClient",
-    name: "DIGIY DRIVER CLIENT",
-    icon: "🚕",
-    tag: "COMMANDER UNE COURSE",
-    desc: "Commande ta course. Paiement direct. 0% commission.",
-    kind: "public",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "loc",
-    name: "DIGIY LOC",
-    icon: "🏠",
-    tag: "LOCATION SANS OTA",
-    desc: "Alternative Booking/Airbnb, direct propriétaire, sans commission.",
-    kind: "public",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "resto",
-    name: "DIGIY RESTO",
-    icon: "🍽️",
-    tag: "VITRINE RESTAURANT",
-    desc: "Menus, photos, horaires, localisation. Réservation directe.",
-    kind: "public",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "build",
-    name: "DIGIY BUILD",
-    icon: "🏗️",
-    tag: "ARTISANS & BTP",
-    desc: "Devis, galerie, contact. Humain. Direct. Sans commission.",
-    kind: "public",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "explore",
-    name: "DIGIY EXPLORE",
-    icon: "🧭",
-    tag: "TOURISME & DÉCOUVERTE",
-    desc: "Découvrir l’Afrique : guides, visibilité, expériences authentiques.",
-    kind: "public",
-    status: "live",
-    phoneParam: false
-  },
-  {
-    key: "market",
-    name: "DIGIY MARKET",
-    icon: "🛍️",
-    tag: "MARKETPLACE LOCALE",
-    desc: "Acheter/vendre local. Annonces propres. Sans commission.",
-    kind: "public",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "jobs",
-    name: "DIGIY JOBS",
-    icon: "💼",
-    tag: "EMPLOI & TALENTS",
-    desc: "Offres, candidatures, profils. Pont talents–employeurs.",
-    kind: "public",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "pay",
-    name: "DIGIY PAY",
-    icon: "💳",
-    tag: "WALLET UNIFIÉ",
-    desc: "Wave / OM / CB. Historique, suivi, activation modules.",
-    kind: "public",
-    status: "soon",
-    phoneParam: true
-  },
-  {
-    key: "resa",
-    name: "DIGIY RESA",
-    icon: "📅",
-    tag: "RÉSERVATIONS",
-    desc: "Planning, confirmations, gestion des réservations. Direct, sans commission.",
-    kind: "public",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "resaTable",
-    name: "DIGIY RESA TABLE",
-    icon: "🪑",
-    tag: "RÉSA RESTAURANT",
-    desc: "Réservation tables, plan de salle, disponibilités.",
-    kind: "public",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "notable",
-    name: "DIGIY NOTABLE",
-    icon: "📓",
-    tag: "NOTES & DOCS",
-    desc: "Notes terrain, procédures, fiches. Organise ton savoir pro.",
-    kind: "public",
-    status: "soon",
-    phoneParam: false
-  },
+  { key:"bonneAffaire", name:"DIGIY BONNE AFFAIRE", icon:"💥", tag:"BONS PLANS • PROMOS",
+    desc:"Les meilleures opportunités locales : promos, deals, bonnes affaires terrain.", kind:"public", status:"live", phoneParam:false },
+
+  { key:"ndimbalMap", name:"DIGIY NDIMBAL MAP", icon:"🗺️", tag:"CARTE COMMUNAUTÉ",
+    desc:"Annuaire géolocalisé : pros, quartiers, filtres. Sénégal terrain.", kind:"public", status:"live", phoneParam:false },
+
+  { key:"driverClient", name:"DIGIY DRIVER CLIENT", icon:"🚕", tag:"COMMANDER UNE COURSE",
+    desc:"Commande ta course. Paiement direct. 0% commission.", kind:"public", status:"live", phoneParam:true },
+
+  { key:"loc", name:"DIGIY LOC", icon:"🏠", tag:"LOCATION SANS OTA",
+    desc:"Alternative Booking/Airbnb, direct propriétaire, sans commission.", kind:"public", status:"live", phoneParam:true },
+
+  { key:"resto", name:"DIGIY RESTO", icon:"🍽️", tag:"VITRINE RESTAURANT",
+    desc:"Menus, photos, horaires, localisation. Réservation directe.", kind:"public", status:"live", phoneParam:true },
+
+  { key:"build", name:"DIGIY BUILD", icon:"🏗️", tag:"ARTISANS & BTP",
+    desc:"Devis, galerie, contact. Humain. Direct. Sans commission.", kind:"public", status:"live", phoneParam:true },
+
+  { key:"explore", name:"DIGIY EXPLORE", icon:"🧭", tag:"TOURISME & DÉCOUVERTE",
+    desc:"Découvrir l’Afrique : guides, visibilité, expériences authentiques.", kind:"public", status:"live", phoneParam:false },
+
+  { key:"market", name:"DIGIY MARKET", icon:"🛍️", tag:"MARKETPLACE LOCALE",
+    desc:"Acheter/vendre local. Annonces propres. Sans commission.", kind:"public", status:"beta", phoneParam:true },
+
+  { key:"jobs", name:"DIGIY JOBS", icon:"💼", tag:"EMPLOI & TALENTS",
+    desc:"Offres, candidatures, profils. Pont talents–employeurs.", kind:"public", status:"beta", phoneParam:true },
+
+  { key:"pay", name:"DIGIY PAY", icon:"💳", tag:"WALLET UNIFIÉ",
+    desc:"Wave / OM / CB. Historique, suivi, activation modules.", kind:"public", status:"soon", phoneParam:true },
+
+  { key:"resa", name:"DIGIY RESA", icon:"📅", tag:"RÉSERVATIONS",
+    desc:"Planning, confirmations, gestion des réservations. Direct, sans commission.", kind:"public", status:"beta", phoneParam:true },
+
+  { key:"resaTable", name:"DIGIY RESA TABLE", icon:"🪑", tag:"RÉSA RESTAURANT",
+    desc:"Réservation tables, plan de salle, disponibilités.", kind:"public", status:"beta", phoneParam:true },
+
+  { key:"notable", name:"DIGIY NOTABLE", icon:"📓", tag:"NOTES & DOCS",
+    desc:"Notes terrain, procédures, fiches. Organise ton savoir pro.", kind:"public", status:"soon", phoneParam:false },
 
   // PRO
-  {
-    key: "driverPro",
-    name: "DIGIY DRIVER PRO",
-    icon: "🚗",
-    tag: "CHAUFFEUR PROFESSIONNEL",
-    desc: "Accepter courses, cockpit, encaissements directs.",
-    kind: "pro",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "caissePro",
-    name: "DIGIY CAISSE PRO",
-    icon: "🧾",
-    tag: "POS + SYNC BATCH",
-    desc: "Caisse pro + sync ultra-légère. Encaissement terrain.",
-    kind: "pro",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "locPro",
-    name: "DIGIY LOC PRO",
-    icon: "🏡",
-    tag: "PROPRIÉTAIRES • PLANNING",
-    desc: "Planning, réservations, cockpit propriétaire.",
-    kind: "pro",
-    status: "live",
-    phoneParam: true
-  },
-  {
-    key: "buildPro",
-    name: "DIGIY BUILD PRO",
-    icon: "🧱",
-    tag: "ARTISANS • DEVIS",
-    desc: "Devis, chantiers, pipeline, visibilité.",
-    kind: "pro",
-    status: "beta",
-    phoneParam: true
-  },
-  {
-    key: "marketPro",
-    name: "DIGIY MARKET PRO",
-    icon: "📦",
-    tag: "BOUTIQUE • CATALOGUE",
-    desc: "Gérer produits, commandes, stock. Terrain ready.",
-    kind: "pro",
-    status: "soon",
-    phoneParam: true
-  },
-  {
-    key: "jobsPro",
-    name: "DIGIY JOBS PRO",
-    icon: "🧑🏾‍💼",
-    tag: "EMPLOYEURS • DOSSIERS",
-    desc: "Gestion des offres, dossiers, suivi accompagnement.",
-    kind: "pro",
-    status: "soon",
-    phoneParam: true
-  },
-  {
-    key: "fretClientProPin",
-    name: "FRET CLIENT PRO",
-    icon: "📦",
-    tag: "ACCÈS PIN (CLIENT)",
-    desc: "Portail FRET client — accès direct via PIN.",
-    kind: "pro",
-    status: "live",
-    phoneParam: false,
-    directUrl: LINKS.fretClientProPin
-  },
-  {
-    key: "fretChauffeurProPin",
-    name: "FRET CHAUFFEUR PRO",
-    icon: "🚚",
-    tag: "ACCÈS PIN (CHAUFFEUR)",
-    desc: "Portail FRET chauffeur — accès direct via PIN.",
-    kind: "pro",
-    status: "live",
-    phoneParam: false,
-    directUrl: LINKS.fretChauffeurProPin
-  }
+  { key:"driverPro", name:"DIGIY DRIVER PRO", icon:"🚗", tag:"CHAUFFEUR PROFESSIONNEL",
+    desc:"Accepter courses, cockpit, encaissements directs.", kind:"pro", status:"live", phoneParam:true },
+
+  { key:"caissePro", name:"DIGIY CAISSE PRO", icon:"🧾", tag:"POS + SYNC BATCH",
+    desc:"Caisse pro + sync ultra-légère. Encaissement terrain.", kind:"pro", status:"beta", phoneParam:true },
+
+  { key:"locPro", name:"DIGIY LOC PRO", icon:"🏡", tag:"PROPRIÉTAIRES • PLANNING",
+    desc:"Planning, réservations, cockpit propriétaire.", kind:"pro", status:"live", phoneParam:true },
+
+  { key:"buildPro", name:"DIGIY BUILD PRO", icon:"🧱", tag:"ARTISANS • DEVIS",
+    desc:"Devis, chantiers, pipeline, visibilité.", kind:"pro", status:"beta", phoneParam:true },
+
+  { key:"marketPro", name:"DIGIY MARKET PRO", icon:"📦", tag:"BOUTIQUE • CATALOGUE",
+    desc:"Gérer produits, commandes, stock. Terrain ready.", kind:"pro", status:"soon", phoneParam:true },
+
+  { key:"jobsPro", name:"DIGIY JOBS PRO", icon:"🧑🏾‍💼", tag:"EMPLOYEURS • DOSSIERS",
+    desc:"Gestion des offres, dossiers, suivi accompagnement.", kind:"pro", status:"soon", phoneParam:true },
+
+  // FRET (PIN direct)
+  { key:"fretClientProPin", name:"FRET CLIENT PRO", icon:"📦", tag:"ACCÈS PIN (CLIENT)",
+    desc:"Portail FRET client — accès direct via PIN.", kind:"pro", status:"live", phoneParam:false, directUrl: LINKS.fretClientProPin },
+
+  { key:"fretChauffeurProPin", name:"FRET CHAUFFEUR PRO", icon:"🚚", tag:"ACCÈS PIN (CHAUFFEUR)",
+    desc:"Portail FRET chauffeur — accès direct via PIN.", kind:"pro", status:"live", phoneParam:false, directUrl: LINKS.fretChauffeurProPin }
 ];
 
 /* ====== helpers ====== */
 function normPhone(p){
   if(!p) return "";
   let s = String(p).trim();
-  // laisse + et chiffres
-  s = s.replace(/[^\d+]/g,"");
-  if(s && !s.startsWith("+")) {
-    // si le gars tape 221..., on met + devant
+  s = s.replace(/[^\d+]/g, "");
+  if(s && !s.startsWith("+")){
     if(s.startsWith("221")) s = "+" + s;
   }
   return s;
 }
 
 function withPhone(url, phone, param="phone"){
-  if(!url) return "";
-  if(!phone) return url;
+  if(!url || !phone) return url || "";
   try{
     const u = new URL(url);
     u.searchParams.set(param, phone);
     return u.toString();
   }catch(_){
-    // fallback si url relative
     const sep = url.includes("?") ? "&" : "?";
     return url + sep + encodeURIComponent(param) + "=" + encodeURIComponent(phone);
   }
 }
 
 function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, (m)=>({
+  return String(s ?? "").replace(/[&<>"']/g, (m)=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   }[m]));
 }
 
+function safeClipboardWrite(text){
+  const t = String(text || "");
+  if(!t) return Promise.reject(new Error("empty"));
+  if(navigator.clipboard?.writeText) return navigator.clipboard.writeText(t);
+
+  // fallback old school
+  return new Promise((resolve, reject)=>{
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      ta.setAttribute("readonly","");
+      ta.style.position = "fixed";
+      ta.style.top = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error("copy failed"));
+    }catch(e){ reject(e); }
+  });
+}
+
 /* ====== modal ====== */
 const modal = {
-  root: null,
-  titleEl: null,
-  textEl: null,
-  okBtn: null,
-  cancelBtn: null,
-  _onOk: null,
-  _onCancel: null,
+  root:null, titleEl:null, textEl:null, okBtn:null, cancelBtn:null,
+  _onOk:null, _onCancel:null,
 
   init(){
     this.root = $("#modal");
+    if(!this.root) return;
     this.titleEl = $("#modalTitle");
     this.textEl  = $("#modalText");
     this.okBtn   = $("#modalOk");
     this.cancelBtn = $("#modalCancel");
-    if(!this.root) return;
 
-    this.okBtn.addEventListener("click", ()=>{
+    this.okBtn?.addEventListener("click", ()=>{
       this.hide();
       if(typeof this._onOk === "function") this._onOk();
     });
-    this.cancelBtn.addEventListener("click", ()=>{
+
+    this.cancelBtn?.addEventListener("click", ()=>{
       this.hide();
       if(typeof this._onCancel === "function") this._onCancel();
     });
@@ -336,13 +200,16 @@ const modal = {
 
   show({title, text, okText="OK", cancelText="Annuler", onOk=null, onCancel=null, hideCancel=false}){
     if(!this.root) return;
-    this.titleEl.textContent = title || "Info";
-    this.textEl.innerHTML = text || "";
-    this.okBtn.textContent = okText;
-    this.cancelBtn.textContent = cancelText;
+    if(this.titleEl) this.titleEl.textContent = title || "Info";
+    if(this.textEl)  this.textEl.innerHTML = text || "";
+    if(this.okBtn)   this.okBtn.textContent = okText;
+    if(this.cancelBtn){
+      this.cancelBtn.textContent = cancelText;
+      this.cancelBtn.style.display = hideCancel ? "none" : "";
+    }
     this._onOk = onOk;
     this._onCancel = onCancel;
-    this.cancelBtn.style.display = hideCancel ? "none" : "";
+
     this.root.classList.remove("hidden");
     this.root.setAttribute("aria-hidden","false");
   },
@@ -360,19 +227,17 @@ const modal = {
   }
 };
 
-/* ====== hub overlay ====== */
+/* ====== hub overlay (iframe) ====== */
 const hub = {
-  overlay: null,
-  frame: null,
-  backBtn: null,
-  closeBtn: null,
+  overlay:null, frame:null, backBtn:null, closeBtn:null,
 
   init(){
     this.overlay = $("#hubOverlay");
     this.frame = $("#hubFrame");
+    if(!this.overlay || !this.frame) return;
+
     this.backBtn = $("#hubBackBtn");
     this.closeBtn = $("#hubCloseBtn");
-    if(!this.overlay || !this.frame) return;
 
     const close = ()=> this.close();
     this.closeBtn?.addEventListener("click", close);
@@ -388,6 +253,11 @@ const hub = {
   },
 
   open(url){
+    if(!this.overlay || !this.frame) {
+      // fallback: si pas d'overlay, ouvre direct
+      window.open(url, "_blank", "noopener");
+      return;
+    }
     if(!url) return;
     this.frame.src = url;
     this.overlay.classList.remove("hidden");
@@ -396,7 +266,7 @@ const hub = {
   },
 
   close(){
-    if(!this.overlay) return;
+    if(!this.overlay || !this.frame) return;
     this.overlay.classList.add("hidden");
     this.overlay.setAttribute("aria-hidden","true");
     this.frame.src = "about:blank";
@@ -410,15 +280,15 @@ let statTotalEl, statPublicEl, statProEl;
 
 /* ====== filters ====== */
 function setFilter(f){
-  state.filter = f;
-  localStorage.setItem(STORAGE_FILTER, f);
-  $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.filter === f));
+  state.filter = f || "all";
+  localStorage.setItem(STORAGE_FILTER, state.filter);
+  $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.filter === state.filter));
   render();
 }
 
 function setSearch(q){
-  state.q = q;
-  localStorage.setItem(STORAGE_SEARCH, q);
+  state.q = q || "";
+  localStorage.setItem(STORAGE_SEARCH, state.q);
   render();
 }
 
@@ -431,38 +301,31 @@ function getFilteredModules(){
 
     if(!q) return true;
 
-    const hay = [
-      m.key, m.name, m.tag, m.desc, m.kind, m.status
-    ].join(" ").toLowerCase();
-
+    const hay = [m.key, m.name, m.tag, m.desc, m.kind, m.status].join(" ").toLowerCase();
     return hay.includes(q);
   });
 }
 
 function updateStats(filtered){
-  const total = filtered.length;
-  const pub = filtered.filter(m=>m.kind==="public").length;
-  const pro = filtered.filter(m=>m.kind==="pro").length;
-
-  statTotalEl.textContent = String(total);
-  statPublicEl.textContent = String(pub);
-  statProEl.textContent = String(pro);
+  if(!statTotalEl || !statPublicEl || !statProEl) return;
+  statTotalEl.textContent  = String(filtered.length);
+  statPublicEl.textContent = String(filtered.filter(m=>m.kind==="public").length);
+  statProEl.textContent    = String(filtered.filter(m=>m.kind==="pro").length);
 }
 
 /* ====== card html ====== */
 function badgeHTML(kind, status){
   const kindBadge = `<span class="badge kind-${kind}">${kind === "pro" ? "PRO" : "PUBLIC"}</span>`;
-  const st = status || "soon";
-  const stBadge = `<span class="badge ${st}">${st.toUpperCase()}</span>`;
+  const st = (status || "soon").toLowerCase();
+  const stBadge = `<span class="badge ${st}">${escapeHtml(st.toUpperCase())}</span>`;
   return kindBadge + stBadge;
 }
 
 function getModuleUrl(m){
-  // direct url priority
+  if(!m) return "";
   let base = m.directUrl || LINKS[m.key] || "";
   if(!base) return "";
 
-  // add phone param if supported
   if(m.phoneParam && state.phone){
     base = withPhone(base, state.phone, "phone");
   }
@@ -486,7 +349,7 @@ function cardHTML(m){
             ${m.tag ? `<span class="badge">${escapeHtml(m.tag)}</span>` : ""}
           </div>
 
-          ${url ? `<div class="smallLink">${escapeHtml(url)}</div>` : ""}
+          ${url ? `<div class="smallLink" title="${escapeHtml(url)}">${escapeHtml(url)}</div>` : ""}
         </div>
       </div>
 
@@ -504,28 +367,31 @@ function cardHTML(m){
 
 /* ====== render ====== */
 function renderGrid(){
-  const grid = modulesGridEl;
-  if(!grid) return;
+  const gridEl = modulesGridEl; // ✅ évite tout “grid is not defined”
+  if(!gridEl) return;
 
   const filtered = getFilteredModules();
-  grid.innerHTML = filtered.length
+  gridEl.innerHTML = filtered.length
     ? filtered.map(cardHTML).join("")
     : `<div class="empty">Aucun module ne correspond à ta recherche.</div>`;
 
-  // ✅ handlers (NO BUG "grid is not defined")
-  $$(".card", grid).forEach(card=>{
+  // handlers
+  $$(".card", gridEl).forEach(card=>{
     card.addEventListener("click", (e)=>{
       const btn = e.target?.closest?.("button");
-      const key = card.getAttribute("data-key");
+      const key = card.getAttribute("data-key") || "";
       const m = MODULES.find(x=>x.key===key);
       if(!m) return;
 
-      if(btn && btn.dataset.action === "copy"){
-        e.preventDefault(); e.stopPropagation();
+      if(btn?.dataset?.action === "copy"){
+        e.preventDefault();
+        e.stopPropagation();
         const link = getModuleUrl(m);
         if(!link) return;
-        navigator.clipboard?.writeText(link).catch(()=>{});
-        modal.info({ title:"Copié ✅", text:`Lien copié.<br><small>${escapeHtml(link)}</small>` });
+
+        safeClipboardWrite(link)
+          .then(()=> modal.info({ title:"Copié ✅", text:`Lien copié.<br><small>${escapeHtml(link)}</small>` }))
+          .catch(()=> modal.info({ title:"Copie", text:`Copie manuelle :<br><small>${escapeHtml(link)}</small>` }));
         return;
       }
 
@@ -544,8 +410,8 @@ function renderGrid(){
 }
 
 function renderPhone(){
-  const p = state.phone ? state.phone : "non mémorisé";
-  phoneTextEl.textContent = p;
+  if(!phoneTextEl) return;
+  phoneTextEl.textContent = state.phone ? state.phone : "non mémorisé";
 }
 
 function render(){
@@ -560,10 +426,7 @@ function openModule(key){
 
   const url = getModuleUrl(m);
   if(!url){
-    modal.info({
-      title:"Module non disponible",
-      text:"Lien non défini pour ce module. Mets l’URL dans LINKS."
-    });
+    modal.info({ title:"Module non disponible", text:"Lien non défini. Mets l’URL dans LINKS." });
     return;
   }
 
@@ -575,7 +438,9 @@ function askPhone(){
     title:"Numéro (optionnel)",
     text:`Entre ton numéro (ex: <b>+221771234567</b>)<br><small>Le HUB peut l’envoyer à certains modules.</small>
           <div style="margin-top:10px">
-            <input id="phonePrompt" style="width:100%;padding:12px;border-radius:14px;border:1px solid rgba(148,163,184,.25);background:rgba(2,6,23,.18);color:#fff;outline:none" placeholder="+221..." value="${escapeHtml(state.phone)}"/>
+            <input id="phonePrompt"
+              style="width:100%;padding:12px;border-radius:14px;border:1px solid rgba(148,163,184,.25);background:rgba(2,6,23,.18);color:#fff;outline:none"
+              placeholder="+221..." value="${escapeHtml(state.phone)}"/>
           </div>`,
     okText:"Enregistrer",
     cancelText:"Annuler",
@@ -588,53 +453,54 @@ function askPhone(){
     }
   });
 
-  // focus input
   setTimeout(()=> $("#phonePrompt")?.focus(), 50);
 }
 
-/* ====== floating vitrine buttons ====== */
+/* ====== floating vitrine buttons (Tarifs / Espace PRO / NDIMBAL / QR) ====== */
 function initFloating(){
+  // NDIMBAL modal
   const nd = $("#digiy-ndimbal");
   const ndClose = $("#digiyCloseBtn");
-  const qrModal = $("#qrModal");
-  const qrClose = $("#qrClose");
 
   const showNdimbal = ()=>{
+    if(!nd) return;
     nd.classList.remove("hidden");
     nd.setAttribute("aria-hidden","false");
   };
   const hideNdimbal = ()=>{
+    if(!nd) return;
     nd.classList.add("hidden");
     nd.setAttribute("aria-hidden","true");
-  };
-  const showQr = ()=>{
-    qrModal.classList.remove("hidden");
-    qrModal.setAttribute("aria-hidden","false");
-  };
-  const hideQr = ()=>{
-    qrModal.classList.add("hidden");
-    qrModal.setAttribute("aria-hidden","true");
   };
 
   $("#digiy-help-btn")?.addEventListener("click", showNdimbal);
   ndClose?.addEventListener("click", hideNdimbal);
   nd?.addEventListener("click", (e)=>{ if(e.target === nd) hideNdimbal(); });
 
-  $("#tarif-bubble-btn")?.addEventListener("click", ()=>{
-    // ouvre tarifs en overlay (vitrine)
-    hub.open(LINKS.tarifs);
-  });
+  // Tarifs / Espace pro
+  $("#tarif-bubble-btn")?.addEventListener("click", ()=> hub.open(LINKS.tarifs));
+  $("#espace-pro-btn")?.addEventListener("click", ()=> hub.open(LINKS.espacePro));
 
-  $("#espace-pro-btn")?.addEventListener("click", ()=>{
-    // espace pro / inscription
-    hub.open(LINKS.espacePro);
-  });
+  // QR modal
+  const qrModal = $("#qrModal");
+  const qrClose = $("#qrClose");
+
+  const showQr = ()=>{
+    if(!qrModal) return;
+    qrModal.classList.remove("hidden");
+    qrModal.setAttribute("aria-hidden","false");
+  };
+  const hideQr = ()=>{
+    if(!qrModal) return;
+    qrModal.classList.add("hidden");
+    qrModal.setAttribute("aria-hidden","true");
+  };
 
   qrClose?.addEventListener("click", hideQr);
   qrModal?.addEventListener("click", (e)=>{ if(e.target === qrModal) hideQr(); });
 
-  // actions NDIMBAL
-  $$(".ndimbalActions .btn").forEach(b=>{
+  // ✅ IMPORTANT : tes boutons NDIMBAL dans ton index.html ont class="digiyAct" (pas .ndimbalActions)
+  $$(".digiyAct").forEach(b=>{
     b.addEventListener("click", ()=>{
       const act = b.dataset.action;
       hideNdimbal();
@@ -649,20 +515,20 @@ function initFloating(){
 /* ====== init ====== */
 function boot(){
   modulesGridEl = $("#modulesGrid");
-  phoneTextEl = $("#phoneText");
+  phoneTextEl   = $("#phoneText");
   searchInputEl = $("#searchInput");
-  statTotalEl = $("#statTotal");
-  statPublicEl = $("#statPublic");
-  statProEl = $("#statPro");
+  statTotalEl   = $("#statTotal");
+  statPublicEl  = $("#statPublic");
+  statProEl     = $("#statPro");
 
   modal.init();
   hub.init();
   initFloating();
 
   // load state
-  state.phone = normPhone(localStorage.getItem(STORAGE_PHONE) || "");
+  state.phone  = normPhone(localStorage.getItem(STORAGE_PHONE) || "");
   state.filter = localStorage.getItem(STORAGE_FILTER) || "all";
-  state.q = localStorage.getItem(STORAGE_SEARCH) || "";
+  state.q      = localStorage.getItem(STORAGE_SEARCH) || "";
 
   // phone UI
   $("#btnEditPhone")?.addEventListener("click", askPhone);
@@ -690,6 +556,7 @@ function boot(){
     searchInputEl.value = state.q || "";
     searchInputEl.addEventListener("input", ()=> setSearch(searchInputEl.value));
   }
+
   $("#btnReset")?.addEventListener("click", ()=>{
     state.q = "";
     localStorage.removeItem(STORAGE_SEARCH);
@@ -708,7 +575,7 @@ function boot(){
 
   // pioneers left (petit random stable)
   const base = 87;
-  const jitter = Math.floor((Date.now()/600000) % 11); // change toutes ~10 min
+  const jitter = Math.floor((Date.now()/600000) % 11); // ~10min
   const val = Math.max(12, base - jitter);
   const pion = $("#pioneersLeft");
   if(pion) pion.textContent = String(val);
