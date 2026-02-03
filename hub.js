@@ -1,218 +1,418 @@
-/* DIGIY HUB — F16 NAV (FIX) : filtre + recherche + stats + rendu modules
-   - robuste (crée les zones si manquantes)
-   - supporte plusieurs templates HTML
+/* DIGIY HUB — F16 (index.html compatible)
+   - Tabs Tous/Public/PRO
+   - Recherche + Reset
+   - Stats (Total/Public/PRO)
+   - Téléphone mémorisé (localStorage)
+   - Rendu modules data-driven dans #modulesGrid
+   - Modal simple (confirm / info)
 */
 
 (() => {
-  const $ = (q, root=document) => root.querySelector(q);
-  const $$ = (q, root=document) => Array.from(root.querySelectorAll(q));
+  // ==============
+  // Utils
+  // ==============
+  const $ = (q, root = document) => root.querySelector(q);
+  const $$ = (q, root = document) => Array.from(root.querySelectorAll(q));
 
-  // =========================
-  // 1) CONFIG URLS (branche tes liens)
-  // =========================
+  const store = {
+    key: "DIGIY_HUB_PHONE",
+    get() {
+      try {
+        const v = localStorage.getItem(this.key);
+        return (v && v.trim()) ? v.trim() : "";
+      } catch (_) { return ""; }
+    },
+    set(v) {
+      try { localStorage.setItem(this.key, (v || "").trim()); } catch (_) {}
+    },
+    clear() {
+      try { localStorage.removeItem(this.key); } catch (_) {}
+    }
+  };
+
+  // ==============
+  // LINKS / MODULES
+  // ==============
+  // helper: add phone param if supported & phone exists
+  function withPhone(url, phone, paramName = "phone") {
+    if (!phone) return url;
+    try {
+      const u = new URL(url, location.href);
+      // évite de doubler si déjà présent
+      if (!u.searchParams.get(paramName)) u.searchParams.set(paramName, phone);
+      return u.toString();
+    } catch (_) {
+      // fallback simple
+      const sep = url.includes("?") ? "&" : "?";
+      return url + sep + encodeURIComponent(paramName) + "=" + encodeURIComponent(phone);
+    }
+  }
+
+  // 🔧 Mets ici tes vrais liens (tu peux modifier tranquille)
   const LINKS = {
+    // public / vitrine
+    ndimbalMap:       "https://beauville.github.io/digiy-mdimbal-map/",
     bonneAffaire:     "https://beauville.github.io/digiy-market/",
-    driverPro:        "https://beauville.github.io/digiy-driver-pro/",
+    explore:          "https://beauville.github.io/digiy-explore/",
     driverClient:     "https://beauville.github.io/digiy-driver-client/",
-    caissePro:        "https://beauville.github.io/digiy-caisse-pro/",
+
+    // pro
+    driverPro:        "https://beauville.github.io/digiy-driver-pro/",
     loc:              "https://beauville.github.io/digiy-loc-pro/",
     resto:            "https://beauville.github.io/digiy-resto/",
-    pay:              "https://beauville.github.io/digiy-pay/",
     build:            "https://beauville.github.io/digiy-build-pro/",
     market:           "https://beauville.github.io/digiy-market/",
     jobs:             "https://beauville.github.io/digiy-jobs/",
-    ndimbalMap:       "https://beauville.github.io/digiy-mdimbal-map/",
+    pay:              "https://beauville.github.io/digiy-pay/",
+    caissePro:        "https://beauville.github.io/digiy-caisse-pro/",
     resa:             "https://beauville.github.io/digiy-resa/",
     resaTable:        "https://beauville.github.io/digiy-resa-table/",
     notable:          "https://beauville.github.io/digiy-notable/",
-    explore:          "https://beauville.github.io/digiy-explore/",
     inscriptionPro:   "https://beauville.github.io/inscription-digiy/",
     espacePro:        "https://beauville.github.io/digiy-espace-pro/",
+
+    // fret (ce que tu viens d’ajouter)
     fretClientPro:    "https://beauville.github.io/fret-client-pro/pin.html",
     fretChauffeurPro: "https://beauville.github.io/fret-chauffeur-pro/pin.html",
   };
 
-  // =========================
-  // 2) DATA MODULES (si ça = vide -> stats 0)
-  // type: "Public" | "PRO"
-  // =========================
+  // type: "public" | "pro"
+  // status: "live" | "beta" | "soon"
   const MODULES = [
-    { key:"ndimbalMap", type:"Public", icon:"🗺️", name:"DIGIY NDIMBAL MAP", tag:"CARTE COMMUNAUTÉ", desc:"Annuaire géolocalisé du Sénégal : pros, quartiers, filtres.", badge:"GRATUIT" },
-    { key:"bonneAffaire", type:"Public", icon:"💥", name:"DIGIY BONNE AFFAIRE", tag:"BONS PLANS • PROMOS", desc:"Promos, deals, bonnes affaires terrain.", badge:"OFFICIEL" },
+    // PUBLIC
+    { key:"ndimbalMap",   type:"public", status:"live", icon:"🗺️", name:"DIGIY NDIMBAL MAP", tag:"CARTE COMMUNAUTÉ", desc:"Annuaire géolocalisé : pros, quartiers, filtres.", phoneParam:false },
+    { key:"bonneAffaire", type:"public", status:"live", icon:"💥", name:"DIGIY BONNE AFFAIRE", tag:"BONS PLANS", desc:"Promos, deals, bonnes affaires terrain.", phoneParam:false },
+    { key:"driverClient", type:"public", status:"live", icon:"🚕", name:"DIGIY DRIVER CLIENT", tag:"COMMANDER", desc:"Commande ta course. Paiement direct.", phoneParam:true },
+    { key:"explore",      type:"public", status:"live", icon:"🧭", name:"DIGIY EXPLORE", tag:"DÉCOUVERTE", desc:"Spots & expériences authentiques.", phoneParam:false },
 
-    { key:"driverClient", type:"Public", icon:"🚕", name:"DIGIY DRIVER CLIENT", tag:"COMMANDER", desc:"Commande ta course VTC. Paiement direct. 0% commission.", badge:"LIVE" },
+    // PRO
+    { key:"driverPro",        type:"pro", status:"live", icon:"🚗", name:"DIGIY DRIVER PRO", tag:"CHAUFFEUR PRO", desc:"Courses, cockpit, encaissements directs.", phoneParam:true },
+    { key:"loc",             type:"pro", status:"live", icon:"🏠", name:"DIGIY LOC", tag:"LOCATION SANS OTA", desc:"Planning & réservations direct propriétaire.", phoneParam:true },
+    { key:"resto",           type:"pro", status:"live", icon:"🍽️", name:"DIGIY RESTO", tag:"VITRINE RESTAURANT", desc:"Menus, photos, résa directe.", phoneParam:true },
+    { key:"build",           type:"pro", status:"live", icon:"🏗️", name:"DIGIY BUILD", tag:"ARTISANS & BTP", desc:"Devis, galerie, contact direct.", phoneParam:true },
 
-    { key:"driverPro", type:"PRO", icon:"🚗", name:"DIGIY DRIVER PRO", tag:"CHAUFFEUR PRO", desc:"Accepter courses, encaissements directs.", badge:"LIVE" },
-    { key:"loc", type:"PRO", icon:"🏠", name:"DIGIY LOC", tag:"LOCATION SANS OTA", desc:"Réservations direct propriétaire. 0% commission.", badge:"LIVE" },
-    { key:"resto", type:"PRO", icon:"🍽️", name:"DIGIY RESTO", tag:"VITRINE RESTAURANT", desc:"Menus, photos, résa directe.", badge:"LIVE" },
-    { key:"build", type:"PRO", icon:"🏗️", name:"DIGIY BUILD", tag:"ARTISANS & BTP", desc:"Devis, galerie, contact direct.", badge:"LIVE" },
+    { key:"pay",             type:"pro", status:"beta", icon:"💳", name:"DIGIY PAY", tag:"WALLET", desc:"Wave/OM/CB • activation modules.", phoneParam:true },
+    { key:"market",          type:"pro", status:"beta", icon:"🛍️", name:"DIGIY MARKET", tag:"MARKETPLACE", desc:"Acheter/vendre local. Sans commission.", phoneParam:true },
+    { key:"jobs",            type:"pro", status:"beta", icon:"💼", name:"DIGIY JOBS", tag:"EMPLOI", desc:"Talents ↔ employeurs • accompagnement dossier.", phoneParam:true },
+    { key:"caissePro",       type:"pro", status:"beta", icon:"🧾", name:"DIGIY CAISSE PRO", tag:"POS TERRAIN", desc:"Caisse + sync léger.", phoneParam:true },
 
-    { key:"caissePro", type:"PRO", icon:"🧾", name:"DIGIY CAISSE PRO", tag:"POS TERRAIN", desc:"Caisse pro + sync ultra-légère.", badge:"NOUVEAU" },
-    { key:"pay", type:"PRO", icon:"💳", name:"DIGIY PAY", tag:"WALLET", desc:"Wave / OM / CB. Activation modules.", badge:"PRIORITÉ" },
-    { key:"market", type:"PRO", icon:"🛍️", name:"DIGIY MARKET", tag:"MARKETPLACE", desc:"Acheter/vendre local. Sans commission.", badge:"PRIORITÉ" },
-    { key:"jobs", type:"PRO", icon:"💼", name:"DIGIY JOBS", tag:"EMPLOI", desc:"Talents ↔ employeurs. Dossiers accompagnés.", badge:"PRIORITÉ" },
-    { key:"resa", type:"PRO", icon:"📅", name:"DIGIY RESA", tag:"RÉSERVATIONS", desc:"Planning, confirmations, gestion résa.", badge:"LIVE" },
-    { key:"resaTable", type:"PRO", icon:"🪑", name:"DIGIY RESA TABLE", tag:"RÉSA RESTO", desc:"Dispos temps réel, plan de salle.", badge:"LIVE" },
-    { key:"notable", type:"PRO", icon:"📓", name:"DIGIY NOTABLE", tag:"NOTES", desc:"Procédures, fiches terrain, docs.", badge:"PRIORITÉ" },
-    { key:"explore", type:"Public", icon:"🧭", name:"DIGIY EXPLORE", tag:"TOURISME", desc:"Découverte, spots, expériences authentiques.", badge:"LIVE" },
+    { key:"resa",            type:"pro", status:"beta", icon:"📅", name:"DIGIY RESA", tag:"RÉSERVATIONS", desc:"Planning, confirmations, gestion.", phoneParam:true },
+    { key:"resaTable",       type:"pro", status:"beta", icon:"🪑", name:"DIGIY RESA TABLE", tag:"RÉSA RESTO", desc:"Dispos temps réel, plan de salle.", phoneParam:true },
+    { key:"notable",         type:"pro", status:"beta", icon:"📓", name:"DIGIY NOTABLE", tag:"DOCS", desc:"Notes, procédures, fiches terrain.", phoneParam:true },
 
-    { key:"inscriptionPro", type:"PRO", icon:"📝", name:"INSCRIPTION PRO", tag:"NOUVEAU COMPTE", desc:"Onboard pro + choix module + tarif.", badge:"NOUVEAU" },
-    { key:"espacePro", type:"PRO", icon:"🧰", name:"ESPACE PRO", tag:"PORTAIL PRO", desc:"Accès modules (slug + PIN).", badge:"LIVE" },
+    { key:"inscriptionPro",  type:"pro", status:"live", icon:"📝", name:"INSCRIPTION PRO", tag:"NOUVEAU COMPTE", desc:"Onboard pro + choix module + tarif.", phoneParam:false },
+    { key:"espacePro",       type:"pro", status:"live", icon:"🧰", name:"ESPACE PRO", tag:"PORTAIL PRO", desc:"Accès modules (slug + PIN).", phoneParam:false },
 
-    { key:"fretClientPro", type:"PRO", icon:"📦", name:"FRET CLIENT PRO", tag:"DEMANDE TRANSPORT", desc:"Créer une demande fret. Accès PIN.", badge:"NOUVEAU" },
-    { key:"fretChauffeurPro", type:"PRO", icon:"🚚", name:"FRET CHAUFFEUR PRO", tag:"MISSIONS", desc:"Accepter missions fret. Accès PIN.", badge:"PRIORITÉ" },
+    // FRET
+    { key:"fretClientPro",    type:"pro", status:"live", icon:"📦", name:"FRET CLIENT PRO", tag:"DEMANDE TRANSPORT", desc:"Créer une demande fret (PIN).", phoneParam:true },
+    { key:"fretChauffeurPro", type:"pro", status:"live", icon:"🚚", name:"FRET CHAUFFEUR PRO", tag:"MISSIONS", desc:"Accepter missions fret (PIN).", phoneParam:true },
   ];
 
-  // =========================
-  // 3) DOM auto (trouve/ crée navigation + liste)
-  // =========================
-  function ensureNavAndList() {
-    // cherche une zone "section" existante
-    const host =
-      $(".section") ||
-      $(".app") ||
-      document.body;
+  // ==============
+  // Modal
+  // ==============
+  const modal = {
+    el: null,
+    title: null,
+    text: null,
+    ok: null,
+    cancel: null,
+    resolver: null,
 
-    // NAV (si pas déjà dans ton HTML)
-    let nav = $("#f16nav");
-    if (!nav) {
-      nav = document.createElement("div");
-      nav.id = "f16nav";
-      nav.style.cssText = "margin:14px 0 12px;padding:14px;border:1px solid rgba(148,163,184,.25);border-radius:16px;background:rgba(2,6,23,.35)";
-      nav.innerHTML = `
-        <div style="font-weight:900;font-size:16px;margin-bottom:10px">🧭 Navigation F16</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
-          <select id="f16filter" style="padding:10px 12px;border-radius:12px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);color:#fff;font-weight:800">
-            <option value="Tous">Tous</option>
-            <option value="Public">Public</option>
-            <option value="PRO">PRO</option>
-          </select>
-          <input id="f16search" placeholder="Chercher un module… (ex: map, loc, driver, pay)"
-            style="flex:1;min-width:240px;padding:10px 12px;border-radius:12px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);color:#fff;font-weight:800"
-          />
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;font-weight:900">
-          <div><span id="f16total">0</span><span style="opacity:.75;margin-left:6px">Total</span></div>
-          <div><span id="f16public">0</span><span style="opacity:.75;margin-left:6px">Public</span></div>
-          <div><span id="f16pro">0</span><span style="opacity:.75;margin-left:6px">PRO</span></div>
-        </div>
-        <div style="margin-top:10px;opacity:.85;font-weight:650">
-          Astuce terrain : si ton numéro est mémorisé, le HUB peut l’envoyer en paramètre aux modules (quand le module le supporte). Sinon, navigation simple.
-        </div>
-      `;
-      // insère au début de la section si possible
-      host.insertBefore(nav, host.firstChild);
+    init() {
+      this.el = $("#modal");
+      this.title = $("#modalTitle");
+      this.text = $("#modalText");
+      this.ok = $("#modalOk");
+      this.cancel = $("#modalCancel");
+
+      if (!this.el) return;
+
+      const close = (value) => {
+        this.el.classList.add("hidden");
+        this.el.setAttribute("aria-hidden", "true");
+        this.resolver && this.resolver(value);
+        this.resolver = null;
+      };
+
+      this.ok?.addEventListener("click", () => close(true));
+      this.cancel?.addEventListener("click", () => close(false));
+
+      // click outside
+      this.el.addEventListener("click", (e) => {
+        if (e.target === this.el) close(false);
+      });
+
+      // esc
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !this.el.classList.contains("hidden")) close(false);
+      });
+
+      this._close = close;
+    },
+
+    confirm({ title = "Confirmer", text = "Tu es sûr ?", okText = "OK", cancelText = "Annuler" } = {}) {
+      if (!this.el) return Promise.resolve(true);
+      this.title.textContent = title;
+      this.text.innerHTML = text;
+      this.ok.textContent = okText;
+      this.cancel.textContent = cancelText;
+
+      this.el.classList.remove("hidden");
+      this.el.setAttribute("aria-hidden", "false");
+
+      return new Promise((resolve) => { this.resolver = resolve; });
+    },
+
+    info({ title = "Info", text = "OK", okText = "OK" } = {}) {
+      if (!this.el) return Promise.resolve(true);
+      this.title.textContent = title;
+      this.text.innerHTML = text;
+      this.ok.textContent = okText;
+      this.cancel.textContent = "Fermer";
+
+      this.el.classList.remove("hidden");
+      this.el.setAttribute("aria-hidden", "false");
+
+      return new Promise((resolve) => { this.resolver = resolve; });
     }
+  };
 
-    // LIST / GRID : on supporte plusieurs noms
-    let grid =
-      $(".modules-grid") ||
-      $("#modulesGrid") ||
-      $("#modulesList") ||
-      $('[data-modules-grid]');
+  // ==============
+  // UI state
+  // ==============
+  const state = {
+    filter: "all",     // all | public | pro
+    q: "",             // search query
+    phone: ""
+  };
 
-    if (!grid) {
-      grid = document.createElement("div");
-      grid.className = "modules-grid";
-      grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px";
-      host.appendChild(grid);
-    }
-
-    return { nav, grid };
+  // ==============
+  // Render
+  // ==============
+  function pillHTML(typeOrStatus) {
+    // relies on your CSS: .pill.live/.pill.beta/.pill.soon/.pill.public/.pill.pro
+    return `<span class="pill ${typeOrStatus}">${typeOrStatus.toUpperCase()}</span>`;
   }
 
-  // =========================
-  // 4) RENDER cards + filtre/recherche + stats
-  // =========================
   function cardHTML(m) {
-    const badge = m.badge ? `<div style="font-weight:900;font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08)">${m.badge}</div>` : "";
+    const url = LINKS[m.key] || "#";
+    const typePill = pillHTML(m.type);
+    const statusPill = pillHTML(m.status);
+
     return `
-      <div class="module" data-open="${m.key}" data-type="${m.type}"
-        style="cursor:pointer;padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.25);background:rgba(2,6,23,.35)"
-      >
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px">
-          <div style="display:flex;gap:10px;align-items:center">
-            <div style="font-size:22px">${m.icon}</div>
-            <div>
-              <div style="font-weight:950">${m.name}</div>
-              <div style="opacity:.8;font-weight:750;font-size:12px;margin-top:2px">${m.tag}</div>
-            </div>
+      <article class="card" data-key="${m.key}" data-type="${m.type}" data-status="${m.status}" tabindex="0" role="button" aria-label="${m.name}">
+        <div class="cardTop">
+          <div class="cardIcon">${m.icon}</div>
+          <div class="cardTitleWrap">
+            <div class="cardTitle">${m.name}</div>
+            <div class="cardTag">${m.tag}</div>
           </div>
-          ${badge}
         </div>
-        <div style="opacity:.9;font-weight:650;line-height:1.3">${m.desc}</div>
-      </div>
+
+        <div class="cardDesc">${m.desc}</div>
+
+        <div class="cardMeta">
+          ${statusPill}
+          ${typePill}
+          <span class="cardGo">→ Ouvrir</span>
+        </div>
+
+        <div class="cardUrl" aria-hidden="true">${url}</div>
+      </article>
     `.trim();
   }
 
-  function updateStats() {
-    $("#f16total") && ($("#f16total").textContent = String(MODULES.length));
-    const pub = MODULES.filter(x => x.type === "Public").length;
-    const pro = MODULES.filter(x => x.type === "PRO").length;
-    $("#f16public") && ($("#f16public").textContent = String(pub));
-    $("#f16pro") && ($("#f16pro").textContent = String(pro));
-  }
+  function match(m) {
+    if (state.filter !== "all" && m.type !== state.filter) return false;
+    if (!state.q) return true;
 
-  function matches(m, filter, q) {
-    if (filter !== "Tous" && m.type !== filter) return false;
-    if (!q) return true;
-    const s = q.toLowerCase();
-    const hay = `${m.name} ${m.tag} ${m.desc} ${m.key}`.toLowerCase();
+    const s = state.q.toLowerCase();
+    const hay = `${m.key} ${m.name} ${m.tag} ${m.desc}`.toLowerCase();
     return hay.includes(s);
   }
 
-  function render(grid, filter, q) {
-    const list = MODULES.filter(m => matches(m, filter, q));
+  function updateStats() {
+    const total = MODULES.length;
+    const pub = MODULES.filter(x => x.type === "public").length;
+    const pro = MODULES.filter(x => x.type === "pro").length;
+
+    const stTotal = $("#statTotal");
+    const stPublic = $("#statPublic");
+    const stPro = $("#statPro");
+
+    if (stTotal) stTotal.textContent = String(total);
+    if (stPublic) stPublic.textContent = String(pub);
+    if (stPro) stPro.textContent = String(pro);
+  }
+
+  function renderGrid() {
+    const grid = $("#modulesGrid");
+    if (!grid) return;
+
+    const list = MODULES.filter(match);
     grid.innerHTML = list.map(cardHTML).join("\n") || `
-      <div style="padding:16px;border-radius:16px;border:1px dashed rgba(148,163,184,.35);opacity:.9;font-weight:800">
-        Aucun module ne match. Essaie “loc”, “map”, “pay”, “fret”…
+      <div class="empty">
+        Aucun module trouvé. Essaie : <b>map</b>, <b>loc</b>, <b>driver</b>, <b>pay</b>, <b>fret</b>.
       </div>
     `;
 
-    // click open
-    $$(".module", grid).forEach(card => {
-      card.addEventListener("click", () => {
-        const key = card.getAttribute("data-open");
-        const url = LINKS[key];
-        if (!url) return alert("URL manquante pour : " + key);
-        window.open(url, "_blank", "noopener");
+    // click / enter open
+    $$(".card", grid).forEach((card) => {
+      const key = card.getAttribute("data-key");
+      card.addEventListener("click", () => openModule(key));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModule(key);
+        }
       });
     });
   }
 
-  // =========================
-  // 5) BOOT
-  // =========================
-  function boot() {
-    const { grid } = ensureNavAndList();
+  // ==============
+  // Open module
+  // ==============
+  function openModule(key) {
+    const m = MODULES.find(x => x.key === key);
+    if (!m) return;
 
-    // Si MODULES vide -> on le dit clairement
-    if (!Array.isArray(MODULES) || MODULES.length === 0) {
-      console.warn("❌ MODULES est vide : stats = 0");
-      grid.innerHTML = `<div style="padding:16px;border-radius:16px;border:1px dashed rgba(148,163,184,.35);font-weight:900">
-        ❌ MODULES est vide → rien à afficher. Vérifie que tu n’as pas écrasé le hub.js.
-      </div>`;
+    const base = LINKS[key];
+    if (!base) {
+      modal.info({
+        title: "Lien manquant",
+        text: `Le module <b>${m.name}</b> n’a pas encore son URL branchée dans <b>hub.js</b>.`
+      });
       return;
     }
 
-    updateStats();
+    let url = base;
+    if (m.phoneParam) url = withPhone(url, state.phone, "phone");
 
-    const filterEl = $("#f16filter");
-    const searchEl = $("#f16search");
-
-    const apply = () => {
-      const filter = filterEl ? filterEl.value : "Tous";
-      const q = searchEl ? searchEl.value.trim() : "";
-      render(grid, filter, q);
-    };
-
-    filterEl?.addEventListener("change", apply);
-    searchEl?.addEventListener("input", apply);
-
-    apply();
+    // ouvre en nouvel onglet (simple & safe)
+    window.open(url, "_blank", "noopener");
   }
 
-  // Defer-safe
+  // ==============
+  // Tabs / Search / Phone
+  // ==============
+  function setActiveTab(filter) {
+    state.filter = filter;
+
+    $$(".tab").forEach(btn => {
+      const f = btn.getAttribute("data-filter");
+      btn.classList.toggle("active", f === filter);
+    });
+
+    renderGrid();
+  }
+
+  function setSearch(v) {
+    state.q = (v || "").trim();
+    renderGrid();
+  }
+
+  function refreshPhoneUI() {
+    const phoneText = $("#phoneText");
+    if (phoneText) phoneText.textContent = state.phone || "non mémorisé";
+  }
+
+  async function editPhone() {
+    const current = state.phone || "";
+    await modal.info({
+      title: "Téléphone",
+      text: `Entre ton numéro (ex: <b>+22177xxxxxxx</b>).<br><small>Astuce: il sert à pré-remplir certains modules.</small>`,
+      okText: "OK"
+    });
+
+    // prompt simple (terrain)
+    const v = (window.prompt("Ton numéro (format international recommandé) :", current) || "").trim();
+    if (!v) return;
+
+    state.phone = v;
+    store.set(v);
+    refreshPhoneUI();
+  }
+
+  async function clearPhone() {
+    const ok = await modal.confirm({
+      title: "Effacer le numéro ?",
+      text: "Ça enlève juste la mémorisation sur cet appareil.",
+      okText: "Oui, effacer",
+      cancelText: "Annuler"
+    });
+    if (!ok) return;
+
+    state.phone = "";
+    store.clear();
+    refreshPhoneUI();
+  }
+
+  // ==============
+  // CTA buttons (à brancher selon ton flow DIGIY)
+  // ==============
+  function wireCTAs() {
+    $("#btnEnterHubPro")?.addEventListener("click", () => {
+      // 👉 choisis ton entrée PRO : espacePro / inscription / pay
+      // je te mets Espace Pro par défaut
+      openModule("espacePro");
+    });
+
+    $("#btnAlreadyAccess")?.addEventListener("click", () => {
+      // accès déjà -> Espace Pro direct
+      openModule("espacePro");
+    });
+
+    $("#btnActivate")?.addEventListener("click", () => {
+      // activation -> PAY (ou page tarifs)
+      openModule("pay");
+    });
+  }
+
+  // ==============
+  // Boot
+  // ==============
+  function boot() {
+    modal.init();
+
+    // phone
+    state.phone = store.get();
+    refreshPhoneUI();
+
+    // stats + render
+    updateStats();
+    renderGrid();
+
+    // tabs
+    $$(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const f = btn.getAttribute("data-filter") || "all";
+        setActiveTab(f);
+      });
+    });
+
+    // search
+    const search = $("#searchInput");
+    const btnReset = $("#btnReset");
+
+    search?.addEventListener("input", () => setSearch(search.value));
+    btnReset?.addEventListener("click", () => {
+      if (search) search.value = "";
+      setSearch("");
+      setActiveTab("all");
+    });
+
+    // phone buttons
+    $("#btnEditPhone")?.addEventListener("click", editPhone);
+    $("#btnClearPhone")?.addEventListener("click", clearPhone);
+
+    // CTAs
+    wireCTAs();
+
+    // default tab active
+    setActiveTab("all");
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
