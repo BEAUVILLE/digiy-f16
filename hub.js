@@ -725,8 +725,90 @@ function boot() {
     if (searchInputEl) searchInputEl.value = "";
     setFilter("all");
   });
+// === BOUTONS FLOTTANTS ===
+// Tarifs DIGIY
+$("#tarif-bubble-btn")?.addEventListener("click", () => {
+  hub.open(LINKS.tarifs);
+});
 
-  // brand scroll top
+// ESPACE PRO
+$("#espace-pro-btn")?.addEventListener("click", () => {
+  hub.open(withPhone(PRO_DEFAULT_URL, state.phone, "phone"));
+});
+
+// NDIMBAL popup
+$("#digiy-help-btn")?.addEventListener("click", () => {
+  const ndimbal = $("#digiy-ndimbal");
+  if (ndimbal) {
+    ndimbal.classList.remove("hidden");
+    ndimbal.setAttribute("aria-hidden", "false");
+  }
+});
+
+// Fermer NDIMBAL
+$("#digiyCloseBtn")?.addEventListener("click", () => {
+  const ndimbal = $("#digiy-ndimbal");
+  if (ndimbal) {
+    ndimbal.classList.add("hidden");
+    ndimbal.setAttribute("aria-hidden", "true");
+  }
+});
+
+// Actions NDIMBAL
+const ndimbal = $("#digiy-ndimbal");
+if (ndimbal) {
+  ndimbal.addEventListener("click", (e) => {
+    const btn = e.target?.closest?.("button");
+    if (!btn || !btn.dataset.action) return;
+
+    const action = btn.dataset.action;
+    
+    // Fermer le popup
+    ndimbal.classList.add("hidden");
+    ndimbal.setAttribute("aria-hidden", "true");
+
+    // Actions
+    if (action === "sell") {
+      hub.open(withPhone(LINKS.jobs, state.phone, "phone"));
+    } else if (action === "job") {
+      hub.open(withPhone(LINKS.jobs, state.phone, "phone"));
+    } else if (action === "qr") {
+      const qrModal = $("#qrModal");
+      if (qrModal) {
+        qrModal.classList.remove("hidden");
+        qrModal.setAttribute("aria-hidden", "false");
+      }
+    }
+  });
+
+  // Fermer en cliquant sur le fond
+  ndimbal.addEventListener("click", (e) => {
+    if (e.target === ndimbal) {
+      ndimbal.classList.add("hidden");
+      ndimbal.setAttribute("aria-hidden", "true");
+    }
+  });
+}
+
+// QR Modal
+$("#qrClose")?.addEventListener("click", () => {
+  const qrModal = $("#qrModal");
+  if (qrModal) {
+    qrModal.classList.add("hidden");
+    qrModal.setAttribute("aria-hidden", "true");
+  }
+});
+
+// Fermer QR en cliquant sur le fond
+const qrModal = $("#qrModal");
+if (qrModal) {
+  qrModal.addEventListener("click", (e) => {
+    if (e.target === qrModal) {
+      qrModal.classList.add("hidden");
+      qrModal.setAttribute("aria-hidden", "true");
+    }
+  });
+}  // brand scroll top
   $("#homeBrand")?.addEventListener("click", (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
