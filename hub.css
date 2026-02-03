@@ -340,3 +340,118 @@ body{
   .heroLeft h1{font-size:24px;}
   .cardActions .btn{min-width: 0; flex: 1;}
 }
+/* =========================
+   DIGIY HUB — VITRINE BOOST
+   (ajoute du punch sans casser)
+   ========================= */
+
+/* micro-animations + accessibilité */
+:focus-visible{outline:2px solid rgba(246,196,83,.55); outline-offset:3px;}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important;}
+}
+
+/* hero plus "vitrine" */
+.heroLeft{
+  position:relative;
+  overflow:hidden;
+}
+.heroLeft::before{
+  content:"";
+  position:absolute; inset:-2px;
+  background:
+    radial-gradient(600px 220px at 20% 0%, rgba(246,196,83,.20), transparent 60%),
+    radial-gradient(520px 240px at 90% 10%, rgba(22,163,74,.18), transparent 60%);
+  opacity:.55;
+  pointer-events:none;
+}
+.heroLeft > *{position:relative; z-index:1;}
+
+/* grille : un peu plus aérée sur desktop */
+.grid{gap:14px}
+
+/* cartes : vitrine feel */
+.card{
+  position:relative;
+  overflow:hidden;
+  transition: transform .14s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.card::before{
+  content:"";
+  position:absolute; inset:-1px;
+  background:
+    radial-gradient(420px 160px at 15% 0%, rgba(246,196,83,.14), transparent 60%),
+    radial-gradient(420px 180px at 90% 10%, rgba(22,163,74,.12), transparent 62%);
+  opacity:.0;
+  transition: opacity .18s ease;
+  pointer-events:none;
+}
+.card:hover{
+  transform: translateY(-3px);
+  border-color: rgba(246,196,83,.35);
+  box-shadow: 0 22px 70px rgba(0,0,0,.42);
+}
+.card:hover::before{opacity:.75}
+.card:active{transform: translateY(-1px) scale(.995)}
+
+/* petit rail "status" en haut de la carte */
+.card::after{
+  content:"";
+  position:absolute; left:14px; right:14px; top:10px;
+  height:3px; border-radius:999px;
+  background: rgba(148,163,184,.18);
+  opacity:.7;
+}
+.card[data-status="live"]::after{background: rgba(34,197,94,.55);}
+.card[data-status="beta"]::after{background: rgba(245,158,11,.55);}
+.card[data-status="soon"]::after{background: rgba(148,163,184,.35);}
+
+/* icône : plus premium */
+.icon{
+  box-shadow: 0 10px 28px rgba(0,0,0,.25);
+}
+.card:hover .icon{
+  border-color: rgba(246,196,83,.30);
+}
+
+/* titre : un chouïa plus lisible */
+.cardTitle{font-size:15.5px}
+.cardDesc{margin-top:8px}
+
+/* badges : meilleur spacing */
+.badges{margin-top:12px}
+
+/* bouton “Ouvrir” clair (style vitrine) */
+.cardActions .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.cardActions .btn.primary{
+  border-color: rgba(246,196,83,.45);
+  background: linear-gradient(135deg, rgba(246,196,83,.22), rgba(22,163,74,.18));
+}
+.cardActions .btn.primary:hover{
+  border-color: rgba(246,196,83,.62);
+}
+.cardActions .btn.ghost:hover{
+  background: rgba(2,6,23,.16);
+}
+
+/* module “public/pro” accent doux */
+.card[data-type="public"]{
+  border-color: rgba(246,196,83,.26);
+}
+.card[data-type="pro"]{
+  border-color: rgba(22,163,74,.22);
+}
+
+/* empty state */
+.empty{
+  border:1px dashed rgba(148,163,184,.35);
+  border-radius: 18px;
+  padding:14px;
+  color:var(--muted);
+  background: rgba(2,6,23,.10);
+}
