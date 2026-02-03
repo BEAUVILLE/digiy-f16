@@ -1,18 +1,17 @@
-/* DIGIY HUB — F16 V2 (data-driven + overlay + fallback)
-   - garde le style vitrine
-   - rend les 19 modules gérables en 1 endroit
-   - overlay iframe + fallback (si WP / XFO bloque)
+/* DIGIY HUB — F16 NAV (FIX) : filtre + recherche + stats + rendu modules
+   - robuste (crée les zones si manquantes)
+   - supporte plusieurs templates HTML
 */
 
 (() => {
   const $ = (q, root=document) => root.querySelector(q);
   const $$ = (q, root=document) => Array.from(root.querySelectorAll(q));
 
-  // ====== 1) CONFIG : mets tes liens ici (tu peux garder les tiens existants) ======
-  // IMPORTANT: fret ajouté (liens PIN directs)
+  // =========================
+  // 1) CONFIG URLS (branche tes liens)
+  // =========================
   const LINKS = {
-    // ⚠️ Ici tu gardes tes URL existantes (je mets quelques placeholders)
-    bonneAffaire:     "https://beauville.github.io/digiy-market/",         // exemple
+    bonneAffaire:     "https://beauville.github.io/digiy-market/",
     driverPro:        "https://beauville.github.io/digiy-driver-pro/",
     driverClient:     "https://beauville.github.io/digiy-driver-client/",
     caissePro:        "https://beauville.github.io/digiy-caisse-pro/",
@@ -29,274 +28,194 @@
     explore:          "https://beauville.github.io/digiy-explore/",
     inscriptionPro:   "https://beauville.github.io/inscription-digiy/",
     espacePro:        "https://beauville.github.io/digiy-espace-pro/",
-
-    // ✅ FRET PRO (PIN direct)
     fretClientPro:    "https://beauville.github.io/fret-client-pro/pin.html",
     fretChauffeurPro: "https://beauville.github.io/fret-chauffeur-pro/pin.html",
   };
 
-  // ====== 2) DATA : 19 modules en 1 liste ======
-  // mode:
-  //  - "iframe" : tente overlay
-  //  - "tab"    : ouvre direct en onglet (utile WP / sécurité)
+  // =========================
+  // 2) DATA MODULES (si ça = vide -> stats 0)
+  // type: "Public" | "PRO"
+  // =========================
   const MODULES = [
-    { key:"bonneAffaire",  icon:"💥", name:"DIGIY BONNE AFFAIRE",  tag:"BONS PLANS • PROMOS", desc:"Les meilleures opportunités locales : promos, deals, bonnes affaires terrain.", badge:{text:"OFFICIEL", cls:"new"}, mode:"iframe" },
-    { key:"driverPro",     icon:"🚗", name:"DIGIY DRIVER PRO",     tag:"CHAUFFEUR PROFESSIONNEL", desc:"Accepter courses, GPS temps réel, encaissements directs.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"driverClient",  icon:"🚕", name:"DIGIY DRIVER CLIENT",  tag:"COMMANDER UNE COURSE", desc:"Commande ta course VTC au Sénégal. Paiement direct. 0% commission.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"caissePro",     icon:"🧾", name:"DIGIY CAISSE PRO",     tag:"POS + SYNC BATCH", desc:"Caisse pro + sync ultra-légère. Encaissement terrain.", badge:{text:"NOUVEAU", cls:"new"}, mode:"iframe" },
-    { key:"loc",           icon:"🏠", name:"DIGIY LOC",           tag:"LOCATION SANS OTA", desc:"Alternative Booking/Airbnb, sans commission, en direct propriétaire.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"resto",         icon:"🍽️", name:"DIGIY RESTO",         tag:"VITRINE RESTAURANT", desc:"Menus, photos, horaires, localisation. Réservation directe.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"pay",           icon:"💳", name:"DIGIY PAY",           tag:"WALLET UNIFIÉ", desc:"Wave / OM / CB. Historique, suivi, activation modules.", badge:{text:"PRIORITÉ", cls:"prio"}, mode:"iframe" },
-    { key:"build",         icon:"🏗️", name:"DIGIY BUILD",         tag:"ARTISANS & BTP", desc:"Devis, galerie, contact. Humain. Direct. Sans commission.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"market",        icon:"🛍️", name:"DIGIY MARKET",        tag:"MARKETPLACE LOCALE", desc:"Acheter/vendre local. Annonces propres. Sans commission.", badge:{text:"PRIORITÉ", cls:"prio"}, mode:"iframe" },
-    { key:"jobs",          icon:"💼", name:"DIGIY JOBS",          tag:"EMPLOI & TALENTS", desc:"Offres, candidatures, profils. Pont talents–employeurs.", badge:{text:"PRIORITÉ", cls:"prio"}, mode:"iframe" },
-    { key:"ndimbalMap",    icon:"🗺️", name:"DIGIY NDIMBAL MAP",    tag:"CARTE COMMUNAUTÉ", desc:"Annuaire géolocalisé du Sénégal : pros, quartiers, filtres.", badge:{text:"GRATUIT", cls:"free"}, mode:"iframe" },
-    { key:"resa",          icon:"📅", name:"DIGIY RESA",          tag:"RÉSERVATIONS", desc:"Planning, confirmations, gestion des réservations. Direct, sans commission.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"resaTable",     icon:"🪑", name:"DIGIY RESA TABLE",     tag:"RÉSA RESTAURANT", desc:"Réservations de tables restaurant. Plan de salle, dispos temps réel.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"notable",       icon:"📓", name:"DIGIY NOTABLE",       tag:"NOTES & DOCS", desc:"Notes, fiches terrain, procédures. Organise ton savoir pro.", badge:{text:"PRIORITÉ", cls:"prio"}, mode:"iframe" },
-    { key:"explore",       icon:"🧭", name:"DIGIY EXPLORE",       tag:"TOURISME & DÉCOUVERTE", desc:"Découvrir l'Afrique • guides • visibilité • expériences authentiques.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
-    { key:"inscriptionPro",icon:"📝", name:"INSCRIPTION PRO",     tag:"NOUVEAU COMPTE PRO", desc:"Inscription intelligente. Choisis ton module, on calcule ton tarif.", badge:{text:"NOUVEAU", cls:"new"}, mode:"iframe" },
-    { key:"espacePro",     icon:"🧰", name:"ESPACE PRO",          tag:"PORTAIL PRO", desc:"Ouvre tes modules (après paiement). Slug + PIN. Tour de contrôle.", badge:{text:"LIVE", cls:""}, mode:"iframe" },
+    { key:"ndimbalMap", type:"Public", icon:"🗺️", name:"DIGIY NDIMBAL MAP", tag:"CARTE COMMUNAUTÉ", desc:"Annuaire géolocalisé du Sénégal : pros, quartiers, filtres.", badge:"GRATUIT" },
+    { key:"bonneAffaire", type:"Public", icon:"💥", name:"DIGIY BONNE AFFAIRE", tag:"BONS PLANS • PROMOS", desc:"Promos, deals, bonnes affaires terrain.", badge:"OFFICIEL" },
 
-    // ✅ FRET
-    { key:"fretClientPro", icon:"📦", name:"DIGIY FRET CLIENT PRO", tag:"DEMANDER UN TRANSPORT", desc:"Créer une demande fret (colis / transport). Accès PRO via PIN.", badge:{text:"NOUVEAU", cls:"new"}, mode:"iframe" },
-    { key:"fretChauffeurPro", icon:"🚚", name:"DIGIY FRET CHAUFFEUR PRO", tag:"ACCEPTER DES MISSIONS", desc:"Recevoir/Accepter missions fret. Paiement direct. Accès PRO via PIN.", badge:{text:"PRIORITÉ", cls:"prio"}, mode:"iframe" },
+    { key:"driverClient", type:"Public", icon:"🚕", name:"DIGIY DRIVER CLIENT", tag:"COMMANDER", desc:"Commande ta course VTC. Paiement direct. 0% commission.", badge:"LIVE" },
+
+    { key:"driverPro", type:"PRO", icon:"🚗", name:"DIGIY DRIVER PRO", tag:"CHAUFFEUR PRO", desc:"Accepter courses, encaissements directs.", badge:"LIVE" },
+    { key:"loc", type:"PRO", icon:"🏠", name:"DIGIY LOC", tag:"LOCATION SANS OTA", desc:"Réservations direct propriétaire. 0% commission.", badge:"LIVE" },
+    { key:"resto", type:"PRO", icon:"🍽️", name:"DIGIY RESTO", tag:"VITRINE RESTAURANT", desc:"Menus, photos, résa directe.", badge:"LIVE" },
+    { key:"build", type:"PRO", icon:"🏗️", name:"DIGIY BUILD", tag:"ARTISANS & BTP", desc:"Devis, galerie, contact direct.", badge:"LIVE" },
+
+    { key:"caissePro", type:"PRO", icon:"🧾", name:"DIGIY CAISSE PRO", tag:"POS TERRAIN", desc:"Caisse pro + sync ultra-légère.", badge:"NOUVEAU" },
+    { key:"pay", type:"PRO", icon:"💳", name:"DIGIY PAY", tag:"WALLET", desc:"Wave / OM / CB. Activation modules.", badge:"PRIORITÉ" },
+    { key:"market", type:"PRO", icon:"🛍️", name:"DIGIY MARKET", tag:"MARKETPLACE", desc:"Acheter/vendre local. Sans commission.", badge:"PRIORITÉ" },
+    { key:"jobs", type:"PRO", icon:"💼", name:"DIGIY JOBS", tag:"EMPLOI", desc:"Talents ↔ employeurs. Dossiers accompagnés.", badge:"PRIORITÉ" },
+    { key:"resa", type:"PRO", icon:"📅", name:"DIGIY RESA", tag:"RÉSERVATIONS", desc:"Planning, confirmations, gestion résa.", badge:"LIVE" },
+    { key:"resaTable", type:"PRO", icon:"🪑", name:"DIGIY RESA TABLE", tag:"RÉSA RESTO", desc:"Dispos temps réel, plan de salle.", badge:"LIVE" },
+    { key:"notable", type:"PRO", icon:"📓", name:"DIGIY NOTABLE", tag:"NOTES", desc:"Procédures, fiches terrain, docs.", badge:"PRIORITÉ" },
+    { key:"explore", type:"Public", icon:"🧭", name:"DIGIY EXPLORE", tag:"TOURISME", desc:"Découverte, spots, expériences authentiques.", badge:"LIVE" },
+
+    { key:"inscriptionPro", type:"PRO", icon:"📝", name:"INSCRIPTION PRO", tag:"NOUVEAU COMPTE", desc:"Onboard pro + choix module + tarif.", badge:"NOUVEAU" },
+    { key:"espacePro", type:"PRO", icon:"🧰", name:"ESPACE PRO", tag:"PORTAIL PRO", desc:"Accès modules (slug + PIN).", badge:"LIVE" },
+
+    { key:"fretClientPro", type:"PRO", icon:"📦", name:"FRET CLIENT PRO", tag:"DEMANDE TRANSPORT", desc:"Créer une demande fret. Accès PIN.", badge:"NOUVEAU" },
+    { key:"fretChauffeurPro", type:"PRO", icon:"🚚", name:"FRET CHAUFFEUR PRO", tag:"MISSIONS", desc:"Accepter missions fret. Accès PIN.", badge:"PRIORITÉ" },
   ];
 
-  // ====== 3) DOM refs (tes IDs existants) ======
-  const grid = $(".modules-grid");
-  const overlay = $("#hubOverlay");
-  const frame = $("#hubFrame");
-  const backBtn = $("#hubBackBtn");
-  const closeBtn = $("#hubCloseBtn");
+  // =========================
+  // 3) DOM auto (trouve/ crée navigation + liste)
+  // =========================
+  function ensureNavAndList() {
+    // cherche une zone "section" existante
+    const host =
+      $(".section") ||
+      $(".app") ||
+      document.body;
 
-  const btnDeals = $("#btnDeals");
-  const btnGetHub = $("#btnGetHub");
-  const btnLogin = $("#btnLogin");
-  const homeBrand = $("#homeBrand");
-
-  const ndimbalBtn = $("#digiy-help-btn");
-  const ndimbalBox = $("#digiy-ndimbal");
-  const ndimbalClose = $("#digiyCloseBtn");
-
-  const qrModal = $("#qrModal");
-  const qrClose = $("#qrClose");
-  const tarifBtn = $("#tarif-bubble-btn");
-  const espaceBtn = $("#espace-pro-btn");
-
-  // ====== 4) Helpers ======
-  function safeOpenTab(url){
-    window.open(url, "_blank", "noopener");
-  }
-
-  function showOverlay(){
-    if(!overlay) return;
-    overlay.setAttribute("aria-hidden","false");
-    document.documentElement.style.overflow = "hidden";
-  }
-  function hideOverlay(){
-    if(!overlay) return;
-    overlay.setAttribute("aria-hidden","true");
-    document.documentElement.style.overflow = "";
-    if(frame) frame.src = "about:blank";
-    removeFallbackBanner();
-  }
-
-  // Bandeau fallback si iframe bloqué / WordPress / sécurité
-  let fallbackTimer = null;
-  function ensureFallbackBanner(url){
-    // crée un petit bandeau au-dessus de l’iframe (dans .hubTop si présent)
-    const top = $(".hubTop");
-    if(!top) return;
-    if($("#digiyFallback")) return;
-
-    const bar = document.createElement("div");
-    bar.id = "digiyFallback";
-    bar.style.cssText = `
-      margin:10px 0 0;
-      padding:10px 12px;
-      border:1px solid rgba(148,163,184,.35);
-      border-radius:12px;
-      background:rgba(2,6,23,.55);
-      color:#e5e7eb;
-      font-weight:650;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-    `;
-    bar.innerHTML = `
-      <div style="line-height:1.25">
-        Si tu vois “refused to connect” ou un écran vide, c’est normal : certains modules bloquent l’iframe.
-      </div>
-      <button id="digiyOpenTab" type="button" style="
-        padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);
-        background:rgba(255,255,255,.10);color:#fff;font-weight:900;cursor:pointer
-      ">Ouvrir en onglet →</button>
-    `;
-    top.appendChild(bar);
-
-    $("#digiyOpenTab")?.addEventListener("click", () => safeOpenTab(url));
-  }
-  function removeFallbackBanner(){
-    const el = $("#digiyFallback");
-    if(el) el.remove();
-  }
-
-  function openInHub(url, mode="iframe"){
-    if(!url) return;
-
-    // Mode onglet direct
-    if(mode === "tab"){
-      safeOpenTab(url);
-      return;
+    // NAV (si pas déjà dans ton HTML)
+    let nav = $("#f16nav");
+    if (!nav) {
+      nav = document.createElement("div");
+      nav.id = "f16nav";
+      nav.style.cssText = "margin:14px 0 12px;padding:14px;border:1px solid rgba(148,163,184,.25);border-radius:16px;background:rgba(2,6,23,.35)";
+      nav.innerHTML = `
+        <div style="font-weight:900;font-size:16px;margin-bottom:10px">🧭 Navigation F16</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <select id="f16filter" style="padding:10px 12px;border-radius:12px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);color:#fff;font-weight:800">
+            <option value="Tous">Tous</option>
+            <option value="Public">Public</option>
+            <option value="PRO">PRO</option>
+          </select>
+          <input id="f16search" placeholder="Chercher un module… (ex: map, loc, driver, pay)"
+            style="flex:1;min-width:240px;padding:10px 12px;border-radius:12px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);color:#fff;font-weight:800"
+          />
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;font-weight:900">
+          <div><span id="f16total">0</span><span style="opacity:.75;margin-left:6px">Total</span></div>
+          <div><span id="f16public">0</span><span style="opacity:.75;margin-left:6px">Public</span></div>
+          <div><span id="f16pro">0</span><span style="opacity:.75;margin-left:6px">PRO</span></div>
+        </div>
+        <div style="margin-top:10px;opacity:.85;font-weight:650">
+          Astuce terrain : si ton numéro est mémorisé, le HUB peut l’envoyer en paramètre aux modules (quand le module le supporte). Sinon, navigation simple.
+        </div>
+      `;
+      // insère au début de la section si possible
+      host.insertBefore(nav, host.firstChild);
     }
 
-    // Tente overlay iframe
-    showOverlay();
-    if(frame) frame.src = url;
+    // LIST / GRID : on supporte plusieurs noms
+    let grid =
+      $(".modules-grid") ||
+      $("#modulesGrid") ||
+      $("#modulesList") ||
+      $('[data-modules-grid]');
 
-    // Fallback : on affiche toujours le bandeau (ça évite les “je vois rien”)
-    ensureFallbackBanner(url);
+    if (!grid) {
+      grid = document.createElement("div");
+      grid.className = "modules-grid";
+      grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px";
+      host.appendChild(grid);
+    }
 
-    // Et on met un timer au cas où (si ça charge pas vite, l’utilisateur a la sortie)
-    clearTimeout(fallbackTimer);
-    fallbackTimer = setTimeout(() => {
-      // rien à faire de plus : le bouton est déjà là
-    }, 1200);
+    return { nav, grid };
   }
 
-  function moduleCardHTML(m){
-    const badge = m.badge?.text
-      ? `<div class="badge ${m.badge.cls || ""}">${m.badge.text}</div>`
-      : "";
+  // =========================
+  // 4) RENDER cards + filtre/recherche + stats
+  // =========================
+  function cardHTML(m) {
+    const badge = m.badge ? `<div style="font-weight:900;font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08)">${m.badge}</div>` : "";
     return `
-      <div class="module" data-open="${m.key}">
-        <div class="module-top">
+      <div class="module" data-open="${m.key}" data-type="${m.type}"
+        style="cursor:pointer;padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.25);background:rgba(2,6,23,.35)"
+      >
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px">
           <div style="display:flex;gap:10px;align-items:center">
-            <div class="module-icon">${m.icon}</div>
+            <div style="font-size:22px">${m.icon}</div>
             <div>
-              <div class="module-name">${m.name}</div>
-              <div class="module-tag">${m.tag}</div>
+              <div style="font-weight:950">${m.name}</div>
+              <div style="opacity:.8;font-weight:750;font-size:12px;margin-top:2px">${m.tag}</div>
             </div>
           </div>
           ${badge}
         </div>
-        <div class="module-body">${m.desc}</div>
+        <div style="opacity:.9;font-weight:650;line-height:1.3">${m.desc}</div>
       </div>
     `.trim();
   }
 
-  // ====== 5) Render (si tu veux du 100% data-driven) ======
-  // Si tu gardes ton HTML en dur, ça marche aussi : on attache juste les events.
-  function renderIfNeeded(){
-    if(!grid) return;
-    // Si déjà rempli par ton HTML, on ne casse rien.
-    const already = $$(".module", grid).length;
-    if(already > 0) return;
-
-    grid.innerHTML = MODULES.map(moduleCardHTML).join("\n");
+  function updateStats() {
+    $("#f16total") && ($("#f16total").textContent = String(MODULES.length));
+    const pub = MODULES.filter(x => x.type === "Public").length;
+    const pro = MODULES.filter(x => x.type === "PRO").length;
+    $("#f16public") && ($("#f16public").textContent = String(pub));
+    $("#f16pro") && ($("#f16pro").textContent = String(pro));
   }
 
-  function bindModuleClicks(){
-    if(!grid) return;
+  function matches(m, filter, q) {
+    if (filter !== "Tous" && m.type !== filter) return false;
+    if (!q) return true;
+    const s = q.toLowerCase();
+    const hay = `${m.name} ${m.tag} ${m.desc} ${m.key}`.toLowerCase();
+    return hay.includes(s);
+  }
 
-    $$(".module", grid).forEach((card) => {
+  function render(grid, filter, q) {
+    const list = MODULES.filter(m => matches(m, filter, q));
+    grid.innerHTML = list.map(cardHTML).join("\n") || `
+      <div style="padding:16px;border-radius:16px;border:1px dashed rgba(148,163,184,.35);opacity:.9;font-weight:800">
+        Aucun module ne match. Essaie “loc”, “map”, “pay”, “fret”…
+      </div>
+    `;
+
+    // click open
+    $$(".module", grid).forEach(card => {
       card.addEventListener("click", () => {
-        const key = card.dataset.open;
-        const m = MODULES.find(x => x.key === key);
+        const key = card.getAttribute("data-open");
         const url = LINKS[key];
-
-        if(!url){
-          console.warn("❌ URL manquante pour:", key);
-          // petit fallback : si pas d’URL, pas de crash
-          alert("Module pas encore branché (URL manquante): " + key);
-          return;
-        }
-
-        // si module existe dans data, on respecte son mode, sinon iframe par défaut
-        openInHub(url, m?.mode || "iframe");
+        if (!url) return alert("URL manquante pour : " + key);
+        window.open(url, "_blank", "noopener");
       });
     });
   }
 
-  // ====== 6) Boutons vitrine / flottants ======
-  function bindVitrineUX(){
-    // CTA “Je veux mon HUB” → scroll vers modules
-    btnGetHub?.addEventListener("click", () => {
-      const section = $(".section");
-      section?.scrollIntoView({behavior:"smooth", block:"start"});
-    });
+  // =========================
+  // 5) BOOT
+  // =========================
+  function boot() {
+    const { grid } = ensureNavAndList();
 
-    // CTA deals
-    btnDeals?.addEventListener("click", () => {
-      const url = LINKS.bonneAffaire;
-      if(url) openInHub(url, "iframe");
-    });
+    // Si MODULES vide -> on le dit clairement
+    if (!Array.isArray(MODULES) || MODULES.length === 0) {
+      console.warn("❌ MODULES est vide : stats = 0");
+      grid.innerHTML = `<div style="padding:16px;border-radius:16px;border:1px dashed rgba(148,163,184,.35);font-weight:900">
+        ❌ MODULES est vide → rien à afficher. Vérifie que tu n’as pas écrasé le hub.js.
+      </div>`;
+      return;
+    }
 
-    // Connexion = Espace PRO
-    btnLogin?.addEventListener("click", () => {
-      const url = LINKS.espacePro;
-      if(url) openInHub(url, "iframe");
-    });
+    updateStats();
 
-    // brand = retour top
-    homeBrand?.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.scrollTo({top:0, behavior:"smooth"});
-    });
+    const filterEl = $("#f16filter");
+    const searchEl = $("#f16search");
 
-    // overlay controls
-    backBtn?.addEventListener("click", hideOverlay);
-    closeBtn?.addEventListener("click", hideOverlay);
-    overlay?.addEventListener("click", (e) => {
-      // ferme si click en dehors de la card
-      const card = $(".hubCard");
-      if(card && !card.contains(e.target)) hideOverlay();
-    });
+    const apply = () => {
+      const filter = filterEl ? filterEl.value : "Tous";
+      const q = searchEl ? searchEl.value.trim() : "";
+      render(grid, filter, q);
+    };
 
-    // NDIMBAL popup
-    ndimbalBtn?.addEventListener("click", () => {
-      if(!ndimbalBox) return;
-      ndimbalBox.setAttribute("aria-hidden","false");
-    });
-    ndimbalClose?.addEventListener("click", () => {
-      ndimbalBox?.setAttribute("aria-hidden","true");
-    });
-    ndimbalBox?.addEventListener("click", (e) => {
-      const box = $(".digiyBox");
-      if(box && !box.contains(e.target)) ndimbalBox.setAttribute("aria-hidden","true");
-    });
+    filterEl?.addEventListener("change", apply);
+    searchEl?.addEventListener("input", apply);
 
-    // QR modal: tu as un bouton NDIMBAL “qr” → on l’écoute
-    $$('[data-action="qr"]').forEach(btn => {
-      btn.addEventListener("click", () => {
-        ndimbalBox?.setAttribute("aria-hidden","true");
-        qrModal?.setAttribute("aria-hidden","false");
-      });
-    });
-    qrClose?.addEventListener("click", () => qrModal?.setAttribute("aria-hidden","true"));
-    qrModal?.addEventListener("click", (e) => {
-      const c = $(".qrContent");
-      if(c && !c.contains(e.target)) qrModal.setAttribute("aria-hidden","true");
-    });
-
-    // Tarifs flottant
-    tarifBtn?.addEventListener("click", () => {
-      // Mets ton lien tarif ici (tu as déjà un lien dans le footer)
-      safeOpenTab("https://beauville.github.io/DIGIY/");
-    });
-
-    // Espace PRO flottant
-    espaceBtn?.addEventListener("click", () => {
-      const url = LINKS.espacePro;
-      if(url) openInHub(url, "iframe");
-    });
+    apply();
   }
 
-  // ====== GO ======
-  renderIfNeeded();
-  bindModuleClicks();
-  bindVitrineUX();
-
+  // Defer-safe
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();
